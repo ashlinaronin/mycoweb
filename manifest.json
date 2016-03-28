@@ -7,8 +7,13 @@
 
     "content_scripts": [
         {
-            "matches": ["http://*/*"],
-            "css": ["sexystyles.css"]
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "css": ["sexystyles.css"],
+            "js": ["inject-styles.js"],
+            "run_at": "document_end"
         }
     ],
     "permissions": [
