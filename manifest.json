@@ -9,7 +9,7 @@
         {
             "matches": [
                 "http://*/*",
-                "https://*/*"
+                "https://*/"
             ],
             "css": ["sexystyles.css"],
             "js": ["inject-styles.js"],
