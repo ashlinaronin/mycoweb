@@ -1,15 +1,15 @@
 {
     "manifest_version": 2,
 
-    "name": "Style Web",
-    "description": "This extension says ya and adds a sexy stylesheet to every page",
+    "name": "MycoWeb",
+    "description": "This extension makes the mycelium underneath the Internet visible",
     "version": "1.0",
 
     "content_scripts": [
         {
             "matches": [
                 "http://*/*",
-                "https://*/"
+                "https://*/*"
             ],
             "css": ["sexystyles.css"],
             "js": ["inject-styles.js"],

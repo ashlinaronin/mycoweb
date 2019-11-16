@@ -1,8 +1,17 @@
 body {
-    color: red !important;
-    text-decoration: line-through;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/f/f6/Mushroom%27s_roots_%28myc%C3%A9lium%29.jpg');
+    animation-duration: 15s;
+    animation-iteration-count: infinite;
+    animation-name: move;
+    animation-direction: alternate;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    text-shadow: 2px 2px #FF0000;
+@keyframes move {
+    from {
+        background-position-x: 0;
+    }
+
+    to {
+        background-position-x: 100vw;
+    }
 }

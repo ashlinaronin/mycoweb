@@ -1,16 +1,5 @@
-// Don't need DOMContentLoaded because the manifest file takes care of script execution order for us
-// replaceImages('https://media.glassdoor.com/sql/702495/pollinate-squarelogo-1432530572224.png');
-
-// say('ya');
-
-function say(whatToSay) {
-    var utterance = new SpeechSynthesisUtterance();
-    utterance.text = whatToSay;
-    utterance.lang = 'en-GB'; // default is en-US
-    utterance.volume = 0.6;
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
-}
+// image By The original uploader was Lex vB at Dutch Wikipedia. - Originally from nl.wikipedia; description page is/was here., CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=2499669
+// replaceImages('https://upload.wikimedia.org/wikipedia/commons/f/f6/Mushroom%27s_roots_%28myc%C3%A9lium%29.jpg');
 
 function replaceImages(newImageSrc) {
     var imgTags = document.getElementsByTagName('img');
