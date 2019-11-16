@@ -12,7 +12,12 @@
                 "https://*/*"
             ],
             "css": ["sexystyles.css"],
-            "js": ["inject-styles.js"],
+            "js": [
+                "fractal/fractal.js",
+                "fractal/animation.js",
+                "fractal/htree.js",
+                "inject-styles.js"
+            ],
             "run_at": "document_end"
         }
     ],
