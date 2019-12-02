@@ -13,10 +13,7 @@
             ],
             "css": ["sexystyles.css"],
             "js": [
-                "fractal/fractal.js",
-                "fractal/animation.js",
-                "fractal/htree.js",
-                "inject-styles.js"
+                "tree.js"
             ],
             "run_at": "document_end"
         }
