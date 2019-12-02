@@ -1,13 +1,14 @@
 const theta = 0.5;
 
 function branch(context, length) {
-  context.fillStyle = "black";
+  context.strokeStyle = "green";
+
   context.beginPath();
   context.moveTo(0, 0);
-  context.lineTo(0, -length);
+  context.lineTo(0, length);
   context.stroke();
-  context.moveTo(0, -length);
-  context.translate(0, -length);
+  context.moveTo(0, length);
+  context.translate(0, length);
 
   // Each branch’s length shrinks by two-thirds.
   length *= 0.66;
@@ -38,7 +39,7 @@ function init() {
 
   const context = canvas.getContext("2d");
 
-  branch(context, 16);
+  branch(context, 200);
 
   document.body.appendChild(canvas);
 }
