@@ -1,7 +1,13 @@
 const theta = 0.65;
 
-function branch(context, length) {
+async function wait(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function branch(context, length) {
   context.strokeStyle = "green";
+
+  await wait(50);
 
   context.beginPath();
   context.moveTo(0, 0);
@@ -20,13 +26,13 @@ function branch(context, length) {
     context.save();
     context.rotate(theta);
     // Subsequent calls to branch() include the length argument.
-    branch(context, length);
+    await branch(context, length);
     context.restore();
 
     // draw right side
     context.save();
     context.rotate(-theta);
-    branch(context, length);
+    await branch(context, length);
     context.restore();
   }
 }
