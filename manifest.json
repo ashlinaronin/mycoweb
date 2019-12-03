@@ -13,6 +13,7 @@
             ],
             "css": ["sexystyles.css"],
             "js": [
+                "gsap/gsap.min.js",
                 "tree.js"
             ],
             "run_at": "document_end"
