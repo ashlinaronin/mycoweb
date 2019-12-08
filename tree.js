@@ -1,12 +1,5 @@
 const theta = 0.65;
-const paths = [
-  [
-    [0, 0], //from
-    [400, 600], //to
-    160, // length // todo this may be redundant, but trying it
-    0 // angle
-  ]
-];
+const paths = [];
 
 let lastRotation = 0;
 let currentRotation = 0;
@@ -23,7 +16,7 @@ async function branch(context, length, angle = 0) {
 
 
   // changing constant for testing - was 2
-  if (length > 70) {
+  if (length > 65) {
     // draw right side
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
@@ -61,7 +54,6 @@ function getRotation(ctx) {
 
 function getCurrentPoint(ctx) {
   let t = getTransform(ctx);
-  debugger;
   return [t.e,t.f];
 }
 
@@ -82,8 +74,6 @@ function getTransform(ctx) {
 
 
 function doActualPath(context, length, angle) {
-  const [lastFrom, lastTo, lastLength, lastAngle] = paths[paths.length-1];
-
   let newFrom = currentStartingPoint;
 
   const newTo = [
@@ -95,7 +85,7 @@ function doActualPath(context, length, angle) {
   console.log("currentRotation", currentRotation);
   console.log(`new path from ${newFrom} to ${newTo}`);
 
-  paths.push([newFrom, newTo, length, currentRotation]);
+  paths.push([newFrom, newTo]);
 
   context.beginPath();
   context.moveTo(0, 0);
@@ -124,9 +114,6 @@ async function init() {
   // clear out all the relative stuff so we can draw the absolute points
   context.strokeStyle = "red";
   context.resetTransform();
-
-  // remove first (dummy) element from paths before drawing
-  paths.shift();
 
   paths.forEach(path => {
     drawSavedPath(context, path[0], path[1]);
