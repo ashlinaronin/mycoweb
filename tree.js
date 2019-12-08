@@ -1,70 +1,92 @@
 const theta = 0.65;
 const paths = [
   [
-    [0, 0],
-    [400, 600],
-    0
+    [0, 0], //from
+    [400, 600], //to
+    160, // length // todo this may be redundant, but trying it
+    0 // angle
   ]
 ];
 
-async function wait(milliseconds) {
-  return new Promise(resolve => setTimeout(resolve, milliseconds));
-}
+let currentLength = 160;
+let lastRotation = 0;
+let currentRotation = 0;
 
 async function branch(context, length, angle = 0) {
   context.strokeStyle = "green";
-
-  // await wait(50);
 
   doActualPath(context, length, angle);
 
   // Each branch’s length shrinks by two-thirds.
   length *= 0.66;
 
+  // hmm?
+  currentLength = length;
+
   console.log(length);
 
-  if (length > 2) {
+  // changing constant for testing - was 2
+  if (length > 70) {
     // draw left side
+    lastRotation = getRotation(context);
     context.save();
     context.rotate(theta);
+    currentRotation = getRotation(context);
     // Subsequent calls to branch() include the length argument.
     await branch(context, length, theta);
     context.restore();
+    currentRotation = lastRotation;
 
-    // // draw right side
-    // context.save();
-    // context.rotate(-theta);
-    // await branch(context, length, -theta);
-    // context.restore();
+    // draw right side
+    lastRotation = getRotation(context);
+    context.save();
+    context.rotate(-theta);
+    currentRotation = getRotation(context);
+    await branch(context, length, -theta);
+    context.restore();
+    currentRotation = lastRotation;
   }
 }
 
+// returns the current rotation in radians, ranged [0, 2π]
+function getRotation(ctx) {
+  let t = getTransform(ctx);
+  let rad = Math.atan2(t.b, t.a);
+  if (rad < 0) { // angle is > Math.PI
+    rad += Math.PI * 2;
+  }
+  return rad;
+}
+
+function getTransform(ctx) {
+  if ('getTransform' in ctx) {
+    return ctx.getTransform();
+  }
+
+  if ('currentTransform' in ctx) {
+    return ctx.currentTransform
+  }
+  // restructure FF's array to an Matrix like object
+  else if (ctx.mozCurrentTransform) {
+    let a = ctx.mozCurrentTransform;
+    return {a:a[0], b:a[1], c:a[2], d:a[3], e:a[4], f:a[5]};
+  }
+}
+
+
 function doActualPath(context, length, angle) {
-  debugger;
+  const [lastFrom, lastTo, lastLength, lastAngle] = paths[paths.length-1];
 
-  const lastPath = paths[paths.length-1];
-
-  // starting from where the last line ended
-  const newFrom = lastPath[1];
-  const newAngle = lastPath[2] + angle;
-
-  console.log("angle", angle);
-  console.log("sine", Math.sin(angle));
-
-  console.log("cos", Math.cos(angle));
-
+  let newFrom = lastTo;
 
   const newTo = [
-    lastPath[1][0] + (length * Math.sin(newAngle)),
-    lastPath[1][1] - (length * Math.cos(newAngle))
+    lastTo[0] + (length * Math.sin(currentRotation)),
+    lastTo[1] - (length * Math.cos(currentRotation))
   ];
-  // const newFrom = lastPath[0];
 
   console.log(`new path from ${newFrom} to ${newTo}`);
 
-  paths.push([newFrom, newTo, newAngle]);
-
-  console.log(paths);
+  paths.push([newFrom, newTo, length, currentRotation]);
 
   context.beginPath();
   context.moveTo(0, 0);
@@ -87,7 +109,7 @@ async function init() {
 
   document.body.appendChild(canvas);
 
-  await branch(context, 160);
+  await branch(context, currentLength);
 
   // clear out all the relative stuff so we can draw the absolute points
   context.strokeStyle = "red";
