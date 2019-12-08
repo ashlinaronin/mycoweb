@@ -1,6 +1,7 @@
-const theta = 0.65;
-const paths = [];
+const THETA = Math.PI / 8;
+const LENGTH_SPEED_MULTIPLIER = 0.003;
 
+let paths = [];
 let lastRotation = 0;
 let currentRotation = 0;
 let currentStartingPoint = [400, 600];
@@ -21,9 +22,9 @@ async function branch(context, length, angle = 0) {
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
     context.save();
-    context.rotate(theta);
+    context.rotate(THETA);
     currentRotation = getRotation(context);
-    await branch(context, length, theta);
+    await branch(context, length, THETA);
     context.restore();
     currentRotation = lastRotation;
     currentStartingPoint = lastStartingPoint;
@@ -32,9 +33,9 @@ async function branch(context, length, angle = 0) {
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
     context.save();
-    context.rotate(-theta);
+    context.rotate(-THETA);
     currentRotation = getRotation(context);
-    await branch(context, length, -theta);
+    await branch(context, length, -THETA);
     context.restore();
     currentRotation = lastRotation;
     currentStartingPoint = lastStartingPoint;
@@ -84,7 +85,7 @@ function doActualPath(context, length, angle) {
   console.log("currentRotation", currentRotation);
   console.log(`new path from ${newFrom} to ${newTo}`);
 
-  paths.push([newFrom, newTo]);
+  paths.push([newFrom, newTo, length]);
 
   context.beginPath();
   context.moveTo(0, 0);
@@ -115,10 +116,12 @@ async function init() {
   context.strokeStyle = "red";
   context.resetTransform();
 
+  const timeline = gsap.timeline();
+
   paths.forEach(path => {
-    const [from, to] = path;
+    const [from, to, length] = path;
     let animPoint = {x: from[0], y: from[1]};
-    gsap.to(animPoint, 3, {
+    timeline.to(animPoint, length * LENGTH_SPEED_MULTIPLIER, {
       x: to[0],
       y: to[1],
       onUpdate: () => {
