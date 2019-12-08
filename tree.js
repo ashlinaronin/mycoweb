@@ -3,8 +3,8 @@ const paths = [];
 
 let lastRotation = 0;
 let currentRotation = 0;
-let currentStartingPoint = [400,600];
-let lastStartingPoint = [0,0];
+let currentStartingPoint = [400, 600];
+let lastStartingPoint = [0, 0];
 
 async function branch(context, length, angle = 0) {
   context.strokeStyle = "green";
@@ -16,8 +16,7 @@ async function branch(context, length, angle = 0) {
   // Each branch’s length shrinks by two-thirds.
   length *= 0.66;
 
-  // changing constant for testing - was 2
-  if (length > 50) {
+  if (length > 2) {
     // draw right side
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
@@ -54,7 +53,7 @@ function getRotation(ctx) {
 
 function getCurrentPoint(ctx) {
   let t = getTransform(ctx);
-  return [t.e,t.f];
+  return [t.e, t.f];
 }
 
 function getTransform(ctx) {
@@ -68,7 +67,7 @@ function getTransform(ctx) {
   // restructure FF's array to an Matrix like object
   else if (ctx.mozCurrentTransform) {
     let a = ctx.mozCurrentTransform;
-    return {a:a[0], b:a[1], c:a[2], d:a[3], e:a[4], f:a[5]};
+    return {a: a[0], b: a[1], c: a[2], d: a[3], e: a[4], f: a[5]};
   }
 }
 
@@ -90,7 +89,8 @@ function doActualPath(context, length, angle) {
   context.beginPath();
   context.moveTo(0, 0);
   context.lineTo(0, -length);
-  context.stroke();
+  // todo: actually cut out all these now-unnecessary canvas contortions
+  // context.stroke();
   context.moveTo(0, -length);
   context.translate(0, -length);
   currentStartingPoint = getCurrentPoint(context);
@@ -116,15 +116,19 @@ async function init() {
   context.resetTransform();
 
   paths.forEach(path => {
-    drawSavedPath(context, path[0], path[1]);
+    const [from, to] = path;
+    let animPoint = {x: from[0], y: from[1]};
+    gsap.to(animPoint, 3, {
+      x: to[0],
+      y: to[1],
+      onUpdate: () => {
+        context.beginPath();
+        context.moveTo(from[0], from[1]);
+        context.lineTo(animPoint.x, animPoint.y);
+        context.stroke();
+      }
+    });
   });
-}
-
-function drawSavedPath(context, [x1,y1], [x2,y2]) {
-  context.beginPath();
-  context.moveTo(x1, y1);
-  context.lineTo(x2, y2);
-  context.stroke();
 }
 
 init();
