@@ -21,7 +21,6 @@ async function branch(context, length, angle = 0) {
   // Each branch’s length shrinks by two-thirds.
   length *= 0.66;
 
-  console.log(length);
 
   // changing constant for testing - was 2
   if (length > 70) {
@@ -30,7 +29,7 @@ async function branch(context, length, angle = 0) {
     lastStartingPoint = getCurrentPoint(context);
     context.save();
     context.rotate(theta);
-    currentRotation = lastRotation + theta;
+    currentRotation = getRotation(context);
     await branch(context, length, theta);
     context.restore();
     currentRotation = lastRotation;
@@ -41,7 +40,7 @@ async function branch(context, length, angle = 0) {
     lastStartingPoint = getCurrentPoint(context);
     context.save();
     context.rotate(-theta);
-    currentRotation = lastRotation - theta;
+    currentRotation = getRotation(context);
     await branch(context, length, -theta);
     context.restore();
     currentRotation = lastRotation;
@@ -87,16 +86,13 @@ function doActualPath(context, length, angle) {
 
   let newFrom = currentStartingPoint;
 
-  // if (paths.length > 1 && length === lastLength) {
-  //   debugger;
-  //   newFrom = lastFrom;
-  // }
-
   const newTo = [
-    lastTo[0] + (length * Math.sin(currentRotation)),
-    lastTo[1] - (length * Math.cos(currentRotation))
+    currentStartingPoint[0] + (length * Math.sin(currentRotation)),
+    currentStartingPoint[1] - (length * Math.cos(currentRotation))
   ];
 
+  console.log("length", length);
+  console.log("currentRotation", currentRotation);
   console.log(`new path from ${newFrom} to ${newTo}`);
 
   paths.push([newFrom, newTo, length, currentRotation]);
