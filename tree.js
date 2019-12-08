@@ -2,7 +2,8 @@ const theta = 0.65;
 const paths = [
   [
     [0, 0],
-    [400, 600]
+    [400, 600],
+    0
   ]
 ];
 
@@ -30,11 +31,11 @@ async function branch(context, length, angle = 0) {
     await branch(context, length, theta);
     context.restore();
 
-    // draw right side
-    context.save();
-    context.rotate(-theta);
-    await branch(context, length, -theta);
-    context.restore();
+    // // draw right side
+    // context.save();
+    // context.rotate(-theta);
+    // await branch(context, length, -theta);
+    // context.restore();
   }
 }
 
@@ -45,16 +46,23 @@ function doActualPath(context, length, angle) {
 
   // starting from where the last line ended
   const newFrom = lastPath[1];
+  const newAngle = lastPath[2] + angle;
+
+  console.log("angle", angle);
+  console.log("sine", Math.sin(angle));
+
+  console.log("cos", Math.cos(angle));
+
 
   const newTo = [
-    lastPath[1][0] - (length * Math.sin(angle)),
-    lastPath[1][1] - (length * Math.cos(angle))
+    lastPath[1][0] + (length * Math.sin(newAngle)),
+    lastPath[1][1] - (length * Math.cos(newAngle))
   ];
   // const newFrom = lastPath[0];
 
   console.log(`new path from ${newFrom} to ${newTo}`);
 
-  paths.push([newFrom, newTo]);
+  paths.push([newFrom, newTo, newAngle]);
 
   console.log(paths);
 
@@ -64,9 +72,6 @@ function doActualPath(context, length, angle) {
   context.stroke();
   context.moveTo(0, -length);
   context.translate(0, -length);
-
-  // update after translation
-  // paths[paths.length-1][1] -= length;
 }
 
 async function init() {
@@ -84,7 +89,12 @@ async function init() {
 
   await branch(context, 160);
 
+  // clear out all the relative stuff so we can draw the absolute points
   context.strokeStyle = "red";
+  context.resetTransform();
+
+  // remove first (dummy) element from paths before drawing
+  paths.shift();
 
   paths.forEach(path => {
     drawSavedPath(context, path[0], path[1]);
