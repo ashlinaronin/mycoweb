@@ -86,13 +86,7 @@ function doActualPath(context, length, angle) {
   console.log(`new path from ${newFrom} to ${newTo}`);
 
   paths.push([newFrom, newTo, length]);
-
-  context.beginPath();
-  context.moveTo(0, 0);
-  context.lineTo(0, -length);
-  // todo: actually cut out all these now-unnecessary canvas contortions
-  // context.stroke();
-  context.moveTo(0, -length);
+  
   context.translate(0, -length);
   currentStartingPoint = getCurrentPoint(context);
 }
