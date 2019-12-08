@@ -11,6 +11,8 @@ const paths = [
 let currentLength = 160;
 let lastRotation = 0;
 let currentRotation = 0;
+let currentStartingPoint = [400,600];
+let lastStartingPoint = [0,0];
 
 async function branch(context, length, angle = 0) {
   context.strokeStyle = "green";
@@ -22,40 +24,54 @@ async function branch(context, length, angle = 0) {
 
   // hmm?
   currentLength = length;
+  // currentStartingPoint = paths[paths.length-1][0];
 
   console.log(length);
 
   // changing constant for testing - was 2
-  if (length > 70) {
+  if (length > 60) {
     // draw left side
     lastRotation = getRotation(context);
+    lastStartingPoint = getCurrentPoint(context);
     context.save();
     context.rotate(theta);
     currentRotation = getRotation(context);
+    currentStartingPoint = getCurrentPoint(context);
     // Subsequent calls to branch() include the length argument.
     await branch(context, length, theta);
     context.restore();
     currentRotation = lastRotation;
+    currentStartingPoint = lastStartingPoint;
 
     // draw right side
     lastRotation = getRotation(context);
+    lastStartingPoint = getCurrentPoint(context);
     context.save();
     context.rotate(-theta);
     currentRotation = getRotation(context);
+    currentStartingPoint = getCurrentPoint(context);
     await branch(context, length, -theta);
     context.restore();
     currentRotation = lastRotation;
+    currentStartingPoint = lastStartingPoint;
   }
 }
 
 // returns the current rotation in radians, ranged [0, 2π]
 function getRotation(ctx) {
   let t = getTransform(ctx);
+  debugger;
   let rad = Math.atan2(t.b, t.a);
   if (rad < 0) { // angle is > Math.PI
     rad += Math.PI * 2;
   }
   return rad;
+}
+
+function getCurrentPoint(ctx) {
+  let t = getTransform(ctx);
+  debugger;
+  return [t.e,t.f];
 }
 
 function getTransform(ctx) {
@@ -77,7 +93,12 @@ function getTransform(ctx) {
 function doActualPath(context, length, angle) {
   const [lastFrom, lastTo, lastLength, lastAngle] = paths[paths.length-1];
 
-  let newFrom = lastTo;
+  let newFrom = currentStartingPoint;
+
+  // if (paths.length > 1 && length === lastLength) {
+  //   debugger;
+  //   newFrom = lastFrom;
+  // }
 
   const newTo = [
     lastTo[0] + (length * Math.sin(currentRotation)),
