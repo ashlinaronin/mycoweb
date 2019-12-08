@@ -1,8 +1,8 @@
 const theta = 0.65;
 const paths = [
   [
-    [400, 600],
-    [0, 0]
+    [0, 0],
+    [400, 600]
   ]
 ];
 
@@ -13,7 +13,7 @@ async function wait(milliseconds) {
 async function branch(context, length, angle = 0) {
   context.strokeStyle = "green";
 
-  await wait(50);
+  // await wait(50);
 
   doActualPath(context, length, angle);
 
@@ -43,11 +43,14 @@ function doActualPath(context, length, angle) {
 
   const lastPath = paths[paths.length-1];
 
+  // starting from where the last line ended
+  const newFrom = lastPath[1];
+
   const newTo = [
-    lastPath[0][0] + length * Math.cos(angle),
-    lastPath[0][1] + length * Math.sin(angle)
+    lastPath[1][0] - (length * Math.sin(angle)),
+    lastPath[1][1] - (length * Math.cos(angle))
   ];
-  const newFrom = lastPath[0];
+  // const newFrom = lastPath[0];
 
   console.log(`new path from ${newFrom} to ${newTo}`);
 
@@ -61,9 +64,12 @@ function doActualPath(context, length, angle) {
   context.stroke();
   context.moveTo(0, -length);
   context.translate(0, -length);
+
+  // update after translation
+  // paths[paths.length-1][1] -= length;
 }
 
-function init() {
+async function init() {
   const canvas = document.createElement('canvas');
   canvas.width = 800;
   canvas.height = 600;
@@ -74,9 +80,22 @@ function init() {
   // move to bottom center for initial branch
   context.translate(400, 600);
 
-  branch(context, 160);
-
   document.body.appendChild(canvas);
+
+  await branch(context, 160);
+
+  context.strokeStyle = "red";
+
+  paths.forEach(path => {
+    drawSavedPath(context, path[0], path[1]);
+  });
+}
+
+function drawSavedPath(context, [x1,y1], [x2,y2]) {
+  context.beginPath();
+  context.moveTo(x1, y1);
+  context.lineTo(x2, y2);
+  context.stroke();
 }
 
 init();
