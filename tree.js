@@ -9,14 +9,15 @@ let lastStartingPoint = [0,0];
 async function branch(context, length, angle = 0) {
   context.strokeStyle = "green";
 
+  currentStartingPoint = getCurrentPoint(context);
+
   doActualPath(context, length, angle);
 
   // Each branch’s length shrinks by two-thirds.
   length *= 0.66;
 
-
   // changing constant for testing - was 2
-  if (length > 65) {
+  if (length > 50) {
     // draw right side
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
@@ -44,7 +45,6 @@ async function branch(context, length, angle = 0) {
 // returns the current rotation in radians, ranged [0, 2π]
 function getRotation(ctx) {
   let t = getTransform(ctx);
-  debugger;
   let rad = Math.atan2(t.b, t.a);
   if (rad < 0) { // angle is > Math.PI
     rad += Math.PI * 2;
