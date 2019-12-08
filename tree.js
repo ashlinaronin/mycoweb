@@ -8,7 +8,6 @@ const paths = [
   ]
 ];
 
-let currentLength = 160;
 let lastRotation = 0;
 let currentRotation = 0;
 let currentStartingPoint = [400,600];
@@ -22,34 +21,27 @@ async function branch(context, length, angle = 0) {
   // Each branch’s length shrinks by two-thirds.
   length *= 0.66;
 
-  // hmm?
-  currentLength = length;
-  // currentStartingPoint = paths[paths.length-1][0];
-
   console.log(length);
 
   // changing constant for testing - was 2
-  if (length > 60) {
-    // draw left side
+  if (length > 70) {
+    // draw right side
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
     context.save();
     context.rotate(theta);
-    currentRotation = getRotation(context);
-    currentStartingPoint = getCurrentPoint(context);
-    // Subsequent calls to branch() include the length argument.
+    currentRotation = lastRotation + theta;
     await branch(context, length, theta);
     context.restore();
     currentRotation = lastRotation;
     currentStartingPoint = lastStartingPoint;
 
-    // draw right side
+    // draw left side
     lastRotation = getRotation(context);
     lastStartingPoint = getCurrentPoint(context);
     context.save();
     context.rotate(-theta);
-    currentRotation = getRotation(context);
-    currentStartingPoint = getCurrentPoint(context);
+    currentRotation = lastRotation - theta;
     await branch(context, length, -theta);
     context.restore();
     currentRotation = lastRotation;
@@ -115,6 +107,7 @@ function doActualPath(context, length, angle) {
   context.stroke();
   context.moveTo(0, -length);
   context.translate(0, -length);
+  currentStartingPoint = getCurrentPoint(context);
 }
 
 async function init() {
@@ -130,7 +123,7 @@ async function init() {
 
   document.body.appendChild(canvas);
 
-  await branch(context, currentLength);
+  await branch(context, 160);
 
   // clear out all the relative stuff so we can draw the absolute points
   context.strokeStyle = "red";
