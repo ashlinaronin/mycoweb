@@ -14,8 +14,8 @@ async function branch(context, length, angle = 0) {
 
   doActualPath(context, length, angle);
 
-  // Each branch’s length shrinks by two-thirds.
-  length *= 0.66;
+  // Each branch’s length shrinks by approximately two-thirds (randomized).
+  length *= getRandomArbitrary(0.5, 0.8);
 
   if (length > 2) {
     // draw right side
@@ -40,6 +40,11 @@ async function branch(context, length, angle = 0) {
     currentRotation = lastRotation;
     currentStartingPoint = lastStartingPoint;
   }
+}
+
+// from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
 }
 
 // returns the current rotation in radians, ranged [0, 2π]
