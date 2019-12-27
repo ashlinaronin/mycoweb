@@ -13,6 +13,7 @@
             ],
             "css": ["sexystyles.css"],
             "js": [
+                "gl-matrix/dist/gl-matrix-min.js",
                 "gsap/gsap.min.js",
                 "tree.js"
             ],
