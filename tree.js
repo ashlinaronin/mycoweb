@@ -36,12 +36,13 @@ function getTransform(ctx) {
   }
 }
 
-async function doBranch(initialLength = 160, color = "red") {
+// todo: trying to figure out how to make them all start from the middle and branch out at different angles
+async function doBranch(initialLength, color, origin, initialAngle) {
   let paths = [];
   let lastRotation = 0;
   let currentRotation = 0;
-  let currentStartingPoint = [400, 600];
-  let lastStartingPoint = [0, 0];
+  let currentStartingPoint = [0,0];
+  let lastStartingPoint = [800, 600];
 
   const canvas = document.createElement('canvas');
   canvas.width = 800;
@@ -50,12 +51,13 @@ async function doBranch(initialLength = 160, color = "red") {
 
   const context = canvas.getContext("2d");
 
-  // move to bottom center for initial branch
-  context.translate(400, 600);
+  // move to indicated origin for initial branch
+  context.translate(...origin);
+  context.rotate(initialAngle);
 
   document.body.appendChild(canvas);
 
-  await branch(context, initialLength);
+  await branch(context, initialLength, initialAngle);
 
   // clear out all the relative stuff so we can draw the absolute points
   context.strokeStyle = color;
@@ -78,9 +80,7 @@ async function doBranch(initialLength = 160, color = "red") {
     });
   });
 
-  async function branch(context, length, angle = 0) {
-    context.strokeStyle = "green";
-
+  async function branch(context, length, angle) {
     currentStartingPoint = getCurrentPoint(context);
 
     doActualPath(context, length, angle);
@@ -134,9 +134,9 @@ async function doBranch(initialLength = 160, color = "red") {
 }
 
 async function init() {
-  await doBranch(160, "red");
-  await doBranch(140, "green");
-  await doBranch(100, "blue");
+  await doBranch(160, "red", [400, 300], 0);
+  await doBranch(140, "green", [400, 300], Math.PI*2);
+  await doBranch(100, "blue", [400, 300], -Math.PI);
 }
 
 init();
