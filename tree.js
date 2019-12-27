@@ -1,47 +1,6 @@
 const THETA = Math.PI / 8;
 const LENGTH_SPEED_MULTIPLIER = 0.003;
 
-let paths = [];
-let lastRotation = 0;
-let currentRotation = 0;
-let currentStartingPoint = [400, 600];
-let lastStartingPoint = [0, 0];
-
-async function branch(context, length, angle = 0) {
-  context.strokeStyle = "green";
-
-  currentStartingPoint = getCurrentPoint(context);
-
-  doActualPath(context, length, angle);
-
-  // Each branch’s length shrinks by approximately two-thirds (randomized).
-  length *= getRandomArbitrary(0.5, 0.8);
-
-  if (length > 2) {
-    // draw right side
-    lastRotation = getRotation(context);
-    lastStartingPoint = getCurrentPoint(context);
-    context.save();
-    context.rotate(THETA);
-    currentRotation = getRotation(context);
-    await branch(context, length, THETA + getRandomArbitrary(0.0, 0.3));
-    context.restore();
-    currentRotation = lastRotation;
-    currentStartingPoint = lastStartingPoint;
-
-    // draw left side
-    lastRotation = getRotation(context);
-    lastStartingPoint = getCurrentPoint(context);
-    context.save();
-    context.rotate(-THETA);
-    currentRotation = getRotation(context);
-    await branch(context, length, -THETA - getRandomArbitrary(0.0, 0.3));
-    context.restore();
-    currentRotation = lastRotation;
-    currentStartingPoint = lastStartingPoint;
-  }
-}
-
 // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
@@ -77,26 +36,13 @@ function getTransform(ctx) {
   }
 }
 
+async function doBranch(initialLength = 160, color = "red") {
+  let paths = [];
+  let lastRotation = 0;
+  let currentRotation = 0;
+  let currentStartingPoint = [400, 600];
+  let lastStartingPoint = [0, 0];
 
-function doActualPath(context, length, angle) {
-  let newFrom = currentStartingPoint;
-
-  const newTo = [
-    currentStartingPoint[0] + (length * Math.sin(currentRotation)),
-    currentStartingPoint[1] - (length * Math.cos(currentRotation))
-  ];
-
-  console.log("length", length);
-  console.log("currentRotation", currentRotation);
-  console.log(`new path from ${newFrom} to ${newTo}`);
-
-  paths.push([newFrom, newTo, length]);
-  
-  context.translate(0, -length);
-  currentStartingPoint = getCurrentPoint(context);
-}
-
-async function init() {
   const canvas = document.createElement('canvas');
   canvas.width = 800;
   canvas.height = 600;
@@ -109,10 +55,10 @@ async function init() {
 
   document.body.appendChild(canvas);
 
-  await branch(context, 160);
+  await branch(context, initialLength);
 
   // clear out all the relative stuff so we can draw the absolute points
-  context.strokeStyle = "red";
+  context.strokeStyle = color;
   context.resetTransform();
 
   const timeline = gsap.timeline();
@@ -131,6 +77,66 @@ async function init() {
       }
     });
   });
+
+  async function branch(context, length, angle = 0) {
+    context.strokeStyle = "green";
+
+    currentStartingPoint = getCurrentPoint(context);
+
+    doActualPath(context, length, angle);
+
+    // Each branch’s length shrinks by approximately two-thirds (randomized).
+    length *= getRandomArbitrary(0.5, 0.8);
+
+    if (length > 2) {
+      // draw right side
+      lastRotation = getRotation(context);
+      lastStartingPoint = getCurrentPoint(context);
+      context.save();
+      context.rotate(THETA);
+      currentRotation = getRotation(context);
+      await branch(context, length, THETA + getRandomArbitrary(0.0, 0.3));
+      context.restore();
+      currentRotation = lastRotation;
+      currentStartingPoint = lastStartingPoint;
+
+      // draw left side
+      lastRotation = getRotation(context);
+      lastStartingPoint = getCurrentPoint(context);
+      context.save();
+      context.rotate(-THETA);
+      currentRotation = getRotation(context);
+      await branch(context, length, -THETA - getRandomArbitrary(0.0, 0.3));
+      context.restore();
+      currentRotation = lastRotation;
+      currentStartingPoint = lastStartingPoint;
+    }
+  }
+
+  function doActualPath(context, length) {
+    let newFrom = currentStartingPoint;
+
+    const newTo = [
+      currentStartingPoint[0] + (length * Math.sin(currentRotation)),
+      currentStartingPoint[1] - (length * Math.cos(currentRotation))
+    ];
+
+    console.log("length", length);
+    console.log("currentRotation", currentRotation);
+    console.log(`new path from ${newFrom} to ${newTo}`);
+
+    paths.push([newFrom, newTo, length]);
+
+    context.translate(0, -length);
+    currentStartingPoint = getCurrentPoint(context);
+  }
+
+}
+
+async function init() {
+  await doBranch(160, "red");
+  await doBranch(140, "green");
+  await doBranch(100, "blue");
 }
 
 init();
