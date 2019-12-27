@@ -24,7 +24,7 @@ async function branch(context, length, angle = 0) {
     context.save();
     context.rotate(THETA);
     currentRotation = getRotation(context);
-    await branch(context, length, THETA);
+    await branch(context, length, THETA + getRandomArbitrary(0.0, 0.3));
     context.restore();
     currentRotation = lastRotation;
     currentStartingPoint = lastStartingPoint;
@@ -35,7 +35,7 @@ async function branch(context, length, angle = 0) {
     context.save();
     context.rotate(-THETA);
     currentRotation = getRotation(context);
-    await branch(context, length, -THETA);
+    await branch(context, length, -THETA - getRandomArbitrary(0.0, 0.3));
     context.restore();
     currentRotation = lastRotation;
     currentStartingPoint = lastStartingPoint;
