@@ -55,6 +55,8 @@ async function doBranch(initialLength, color, origin, initialAngle) {
   context.translate(...origin);
   context.rotate(initialAngle);
 
+  currentRotation = getRotation(context);
+
   document.body.appendChild(canvas);
 
   await branch(context, initialLength, initialAngle);
@@ -134,9 +136,12 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 }
 
 async function init() {
-  await doBranch(160, "red", [400, 300], 0);
-  await doBranch(140, "green", [400, 300], Math.PI*2);
-  await doBranch(100, "blue", [400, 300], -Math.PI);
+  await doBranch(105, "red", [400, 300], 0);
+  await doBranch(100, "green", [400, 300], Math.PI / 4);
+  await doBranch(100, "green", [400, 300], 3 * Math.PI / 4);
+  await doBranch(105, "blue", [400, 300], Math.PI);
+  await doBranch(100, "green", [400,300], 5 * Math.PI / 4);
+  await doBranch(100, "green", [400,300], 7 * Math.PI / 4);
 }
 
 init();
