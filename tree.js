@@ -1,5 +1,6 @@
 const THETA = Math.PI / 8;
 const LENGTH_SPEED_MULTIPLIER = 0.003;
+const LENGTH_BRANCH_CUTOFF = 2;
 
 // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomArbitrary(min, max) {
@@ -36,7 +37,7 @@ function getTransform(ctx) {
   }
 }
 
-// todo: trying to figure out how to make them all start from the middle and branch out at different angles
+// TODO: use glMatrix or other matrix solution to avoid instantiating multiple canvases (esp since we could just be writing to one)
 async function doBranch(initialLength, color, origin, initialAngle) {
   let paths = [];
   let lastRotation = 0;
@@ -90,7 +91,7 @@ async function doBranch(initialLength, color, origin, initialAngle) {
     // Each branch’s length shrinks by approximately two-thirds (randomized).
     length *= getRandomArbitrary(0.5, 0.8);
 
-    if (length > 2) {
+    if (length > LENGTH_BRANCH_CUTOFF) {
       // draw right side
       lastRotation = getRotation(context);
       lastStartingPoint = getCurrentPoint(context);
@@ -136,12 +137,12 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 }
 
 async function init() {
-  await doBranch(105, "red", [400, 300], 0);
-  await doBranch(100, "green", [400, 300], Math.PI / 4);
-  await doBranch(100, "green", [400, 300], 3 * Math.PI / 4);
-  await doBranch(105, "blue", [400, 300], Math.PI);
-  await doBranch(100, "green", [400,300], 5 * Math.PI / 4);
-  await doBranch(100, "green", [400,300], 7 * Math.PI / 4);
+  await doBranch(55, "red", [400, 300], 0);
+  await doBranch(50, "green", [400, 300], Math.PI / 4);
+  await doBranch(50, "green", [400, 300], 3 * Math.PI / 4);
+  await doBranch(55, "blue", [400, 300], Math.PI);
+  await doBranch(50, "green", [400,300], 5 * Math.PI / 4);
+  await doBranch(50, "green", [400,300], 7 * Math.PI / 4);
 }
 
 init();
