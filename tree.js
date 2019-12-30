@@ -101,36 +101,31 @@ async function doBranch(initialLength, color, origin, initialAngle) {
       const branchesRight = flipCoin();
 
       if (branchesRight) {
-        // draw right side
         const rightRotation = THETA + getRandomArbitrary(0.0, 0.3);
-        lastRotation = getRotation(context);
-        lastStartingPoint = getCurrentPoint(context);
-        context.save();
-        context.rotate(rightRotation);
-        currentRotation = getRotation(context);
-        await branch(context, length, rightRotation);
-        context.restore();
-        currentRotation = lastRotation;
-        currentStartingPoint = lastStartingPoint;
+        await doRotation(context, length, rightRotation);
       }
 
       if (branchesLeft) {
-        // draw left side
         const leftRotation = -THETA - getRandomArbitrary(0.0, 0.3);
-        lastRotation = getRotation(context);
-        lastStartingPoint = getCurrentPoint(context);
-        context.save();
-        context.rotate(leftRotation);
-        currentRotation = getRotation(context);
-        await branch(context, length, leftRotation);
-        context.restore();
-        currentRotation = lastRotation;
-        currentStartingPoint = lastStartingPoint;
+        await doRotation(context, length, leftRotation);
       }
     }
 
     // return the last point so we can start another hypha from there
     return getCurrentPoint(context);
+  }
+
+  async function doRotation(context, length, angle) {
+    // draw left side
+    lastRotation = getRotation(context);
+    lastStartingPoint = getCurrentPoint(context);
+    context.save();
+    context.rotate(angle);
+    currentRotation = getRotation(context);
+    await branch(context, length, angle);
+    context.restore();
+    currentRotation = lastRotation;
+    currentStartingPoint = lastStartingPoint;
   }
 
   function doActualPath(context, length) {
