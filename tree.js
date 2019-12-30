@@ -102,12 +102,13 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 
       if (branchesRight) {
         // draw right side
+        const rightRotation = THETA + getRandomArbitrary(0.0, 0.3);
         lastRotation = getRotation(context);
         lastStartingPoint = getCurrentPoint(context);
         context.save();
-        context.rotate(THETA);
+        context.rotate(rightRotation);
         currentRotation = getRotation(context);
-        await branch(context, length, THETA + getRandomArbitrary(0.0, 0.3));
+        await branch(context, length, rightRotation);
         context.restore();
         currentRotation = lastRotation;
         currentStartingPoint = lastStartingPoint;
@@ -115,12 +116,13 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 
       if (branchesLeft) {
         // draw left side
+        const leftRotation = -THETA - getRandomArbitrary(0.0, 0.3);
         lastRotation = getRotation(context);
         lastStartingPoint = getCurrentPoint(context);
         context.save();
-        context.rotate(-THETA);
+        context.rotate(leftRotation);
         currentRotation = getRotation(context);
-        await branch(context, length, -THETA - getRandomArbitrary(0.0, 0.3));
+        await branch(context, length, leftRotation);
         context.restore();
         currentRotation = lastRotation;
         currentStartingPoint = lastStartingPoint;
