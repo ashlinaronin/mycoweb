@@ -1,4 +1,4 @@
-const THETA = Math.PI / 8;
+const THETA = Math.PI / 8; // looks really cool with 90 deg (pi/2)
 const LENGTH_SPEED_MULTIPLIER = 0.003;
 const LENGTH_BRANCH_CUTOFF = 0.8;
 
@@ -162,12 +162,11 @@ async function init() {
   await doMultipleBranches([55, "red", [400, 300], 0], 3);
 
   // todo start new branches off the end of old ones
-
-  await doBranch(50, "green", [400, 300], Math.PI / 4);
-  await doBranch(50, "green", [400, 300], 3 * Math.PI / 4);
-  await doBranch(55, "blue", [400, 300], Math.PI);
-  await doBranch(50, "green", [400, 300], 5 * Math.PI / 4);
-  await doBranch(50, "green", [400, 300], 7 * Math.PI / 4);
+  await doMultipleBranches([50, "green", [400, 300], Math.PI / 4], 3);
+  await doMultipleBranches([50, "green", [400, 300], 3 * Math.PI / 4], 3);
+  await doMultipleBranches([55, "blue", [400, 300], Math.PI], 3);
+  await doMultipleBranches([50, "green", [400, 300], 5 * Math.PI / 4], 3);
+  await doMultipleBranches([50, "green", [400, 300], 7 * Math.PI / 44], 3);
 }
 
 init();
