@@ -1,6 +1,6 @@
 const THETA = Math.PI / 8; // looks really cool with 90 deg (pi/2)
 const LENGTH_SPEED_MULTIPLIER = 0.003;
-const LENGTH_BRANCH_CUTOFF = 0.8;
+const LENGTH_BRANCH_CUTOFF = 2;
 
 // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomArbitrary(min, max) {
@@ -101,13 +101,20 @@ async function doBranch(initialLength, color, origin, initialAngle) {
       const branchesRight = flipCoin();
 
       if (branchesRight) {
-        const rightRotation = THETA + getRandomArbitrary(0.0, 0.3);
-        await doRotation(context, length, rightRotation);
+        const rightAngle = THETA + getRandomArbitrary(0.0, 0.3);
+        await doRotation(context, length, rightAngle);
+
+        //todo: freezes when i enable this-- not infinite recursion, but exponentially more to calculate -- reaching limits of the canvas
+        // const another = THETA*2 + getRandomArbitrary(0.0, 0.3);
+        // await doRotation(context, length, another);
       }
 
       if (branchesLeft) {
-        const leftRotation = -THETA - getRandomArbitrary(0.0, 0.3);
-        await doRotation(context, length, leftRotation);
+        const leftAngle = -THETA - getRandomArbitrary(0.0, 0.3);
+        await doRotation(context, length, leftAngle);
+
+        // const another = -THETA*2 - getRandomArbitrary(0.0, 0.3);
+        // await doRotation(context, length, another);
       }
     }
   }
@@ -155,14 +162,14 @@ async function doMultipleBranches(params, numIterations) {
 
 async function init() {
   // pit multiple branches against each other, for 3d density effect
-  await doMultipleBranches([55, "red", [400, 300], 0], 3);
+  await doMultipleBranches([55, "red", [400, 300], 0], 1);
 
   // todo start new branches off the end of old ones
-  await doMultipleBranches([50, "green", [400, 300], Math.PI / 4], 3);
-  await doMultipleBranches([50, "green", [400, 300], 3 * Math.PI / 4], 3);
-  await doMultipleBranches([55, "blue", [400, 300], Math.PI], 3);
-  await doMultipleBranches([50, "green", [400, 300], 5 * Math.PI / 4], 3);
-  await doMultipleBranches([50, "green", [400, 300], 7 * Math.PI / 44], 3);
+  // await doMultipleBranches([50, "green", [400, 300], Math.PI / 4], 3);
+  // await doMultipleBranches([50, "green", [400, 300], 3 * Math.PI / 4], 3);
+  // await doMultipleBranches([55, "blue", [400, 300], Math.PI], 3);
+  // await doMultipleBranches([50, "green", [400, 300], 5 * Math.PI / 4], 3);
+  // await doMultipleBranches([50, "green", [400, 300], 7 * Math.PI / 44], 3);
 }
 
 init();
