@@ -110,9 +110,6 @@ async function doBranch(initialLength, color, origin, initialAngle) {
         await doRotation(context, length, leftRotation);
       }
     }
-
-    // return the last point so we can start another hypha from there
-    return getCurrentPoint(context);
   }
 
   async function doRotation(context, length, angle) {
@@ -146,6 +143,8 @@ async function doBranch(initialLength, color, origin, initialAngle) {
     currentStartingPoint = getCurrentPoint(context);
   }
 
+  // return "to" point of last path so we can chain new hyphae off of it
+  return paths[paths.length-1][1];
 }
 
 async function doMultipleBranches(params, numIterations) {
