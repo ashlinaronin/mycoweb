@@ -1,10 +1,14 @@
 const THETA = Math.PI / 8;
 const LENGTH_SPEED_MULTIPLIER = 0.003;
-const LENGTH_BRANCH_CUTOFF = 2;
+const LENGTH_BRANCH_CUTOFF = 0.8;
 
 // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
+}
+
+function flipCoin() {
+  return Math.random() >= 0.5;
 }
 
 // returns the current rotation in radians, ranged [0, 2π]
@@ -89,31 +93,42 @@ async function doBranch(initialLength, color, origin, initialAngle) {
     doActualPath(context, length, angle);
 
     // Each branch’s length shrinks by approximately two-thirds (randomized).
-    length *= getRandomArbitrary(0.5, 0.8);
+    length *= getRandomArbitrary(0.8, 0.95);
 
     if (length > LENGTH_BRANCH_CUTOFF) {
-      // draw right side
-      lastRotation = getRotation(context);
-      lastStartingPoint = getCurrentPoint(context);
-      context.save();
-      context.rotate(THETA);
-      currentRotation = getRotation(context);
-      await branch(context, length, THETA + getRandomArbitrary(0.0, 0.3));
-      context.restore();
-      currentRotation = lastRotation;
-      currentStartingPoint = lastStartingPoint;
+      // determine based on probability if it goes right or left
+      const branchesLeft = flipCoin();
+      const branchesRight = flipCoin();
 
-      // draw left side
-      lastRotation = getRotation(context);
-      lastStartingPoint = getCurrentPoint(context);
-      context.save();
-      context.rotate(-THETA);
-      currentRotation = getRotation(context);
-      await branch(context, length, -THETA - getRandomArbitrary(0.0, 0.3));
-      context.restore();
-      currentRotation = lastRotation;
-      currentStartingPoint = lastStartingPoint;
+      if (branchesRight) {
+        // draw right side
+        lastRotation = getRotation(context);
+        lastStartingPoint = getCurrentPoint(context);
+        context.save();
+        context.rotate(THETA);
+        currentRotation = getRotation(context);
+        await branch(context, length, THETA + getRandomArbitrary(0.0, 0.3));
+        context.restore();
+        currentRotation = lastRotation;
+        currentStartingPoint = lastStartingPoint;
+      }
+
+      if (branchesLeft) {
+        // draw left side
+        lastRotation = getRotation(context);
+        lastStartingPoint = getCurrentPoint(context);
+        context.save();
+        context.rotate(-THETA);
+        currentRotation = getRotation(context);
+        await branch(context, length, -THETA - getRandomArbitrary(0.0, 0.3));
+        context.restore();
+        currentRotation = lastRotation;
+        currentStartingPoint = lastStartingPoint;
+      }
     }
+
+    // return the last point so we can start another hypha from there
+    return getCurrentPoint(context);
   }
 
   function doActualPath(context, length) {
@@ -136,13 +151,23 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 
 }
 
+async function doMultipleBranches(params, numIterations) {
+  for (let i = 0; i < numIterations; i++) {
+    await doBranch(...params);
+  }
+}
+
 async function init() {
-  await doBranch(55, "red", [400, 300], 0);
+  // pit multiple branches against each other, for 3d density effect
+  await doMultipleBranches([55, "red", [400, 300], 0], 3);
+
+  // todo start new branches off the end of old ones
+
   await doBranch(50, "green", [400, 300], Math.PI / 4);
   await doBranch(50, "green", [400, 300], 3 * Math.PI / 4);
   await doBranch(55, "blue", [400, 300], Math.PI);
-  await doBranch(50, "green", [400,300], 5 * Math.PI / 4);
-  await doBranch(50, "green", [400,300], 7 * Math.PI / 4);
+  await doBranch(50, "green", [400, 300], 5 * Math.PI / 4);
+  await doBranch(50, "green", [400, 300], 7 * Math.PI / 4);
 }
 
 init();
