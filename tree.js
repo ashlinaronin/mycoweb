@@ -1,6 +1,9 @@
-const THETA = Math.PI / 8; // looks really cool with 90 deg (pi/2)
-const LENGTH_SPEED_MULTIPLIER = 0.003;
+const THETA = Math.PI / 2; // looks really cool with 90 deg (pi/2)
+const LENGTH_SPEED_MULTIPLIER = 0.0003;
 const LENGTH_BRANCH_CUTOFF = 2;
+
+const CANVAS_WIDTH = 1920;
+const CANVAS_HEIGHT = 1080;
 
 // from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomArbitrary(min, max) {
@@ -47,11 +50,11 @@ async function doBranch(initialLength, color, origin, initialAngle) {
   let lastRotation = 0;
   let currentRotation = 0;
   let currentStartingPoint = [0,0];
-  let lastStartingPoint = [800, 600];
+  let lastStartingPoint = [CANVAS_WIDTH, CANVAS_HEIGHT];
 
   const canvas = document.createElement('canvas');
-  canvas.width = 800;
-  canvas.height = 600;
+  canvas.width = CANVAS_WIDTH;
+  canvas.height = CANVAS_HEIGHT;
   canvas.className = "mycelium-canvas";
 
   const context = canvas.getContext("2d");
@@ -93,12 +96,14 @@ async function doBranch(initialLength, color, origin, initialAngle) {
     doActualPath(context, length, angle);
 
     // Each branch’s length shrinks by approximately two-thirds (randomized).
-    length *= getRandomArbitrary(0.8, 0.95);
+    length *= getRandomArbitrary(0.5, 0.7);
 
     if (length > LENGTH_BRANCH_CUTOFF) {
       // determine based on probability if it goes right or left
       const branchesLeft = flipCoin();
       const branchesRight = flipCoin();
+      const branchesCenter = flipCoin();
+      const branchesAnother = flipCoin();
 
       if (branchesRight) {
         const rightAngle = THETA + getRandomArbitrary(0.0, 0.3);
@@ -116,6 +121,18 @@ async function doBranch(initialLength, color, origin, initialAngle) {
         // const another = -THETA*2 - getRandomArbitrary(0.0, 0.3);
         // await doRotation(context, length, another);
       }
+
+      if (branchesCenter) {
+        const centerAngle = THETA * 2 + getRandomArbitrary(0.0, 0.3);
+        await doRotation(context, length, centerAngle);
+      }
+
+      if (branchesAnother) {
+        const anotherAngle = -THETA * 2 + getRandomArbitrary(0.0, 0.3);
+        await doRotation(context, length, anotherAngle);
+      }
+
+
     }
   }
 
@@ -161,15 +178,27 @@ async function doMultipleBranches(params, numIterations) {
 }
 
 async function init() {
+  const ORIGIN = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2];
+  
   // pit multiple branches against each other, for 3d density effect
-  await doMultipleBranches([55, "red", [400, 300], 0], 1);
+  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 0], 2);
+
+  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, Math.PI / 4], 2);
+
+  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 3 * Math.PI / 4], 2);
+
+  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, Math.PI], 2);
+
+  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 5 * Math.PI / 4], 2);
+
+  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 7 * Math.PI / 4], 2);
 
   // todo start new branches off the end of old ones
-  // await doMultipleBranches([50, "green", [400, 300], Math.PI / 4], 3);
-  // await doMultipleBranches([50, "green", [400, 300], 3 * Math.PI / 4], 3);
-  // await doMultipleBranches([55, "blue", [400, 300], Math.PI], 3);
-  // await doMultipleBranches([50, "green", [400, 300], 5 * Math.PI / 4], 3);
-  // await doMultipleBranches([50, "green", [400, 300], 7 * Math.PI / 44], 3);
+  // await doMultipleBranches([50, "green", ORIGIN, Math.PI / 4], 3);
+  // await doMultipleBranches([50, "green", ORIGIN, 3 * Math.PI / 4], 3);
+  // await doMultipleBranches([55, "blue", ORIGIN, Math.PI], 3);
+  // await doMultipleBranches([50, "green", ORIGIN, 5 * Math.PI / 4], 3);
+  // await doMultipleBranches([50, "green", ORIGIN, 7 * Math.PI / 4], 3);
 }
 
 init();
