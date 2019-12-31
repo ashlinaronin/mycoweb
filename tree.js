@@ -134,10 +134,6 @@ async function doBranch(initialLength, color, origin, initialAngle) {
       currentStartingPoint[1] - (length * Math.cos(currentRotation))
     ];
 
-    console.log("length", length);
-    console.log("currentRotation", currentRotation);
-    console.log(`new path from ${newFrom} to ${newTo}`);
-
     paths.push([newFrom, newTo, length]);
 
     context.translate(0, -length);
@@ -148,7 +144,7 @@ async function doBranch(initialLength, color, origin, initialAngle) {
   return paths;
 }
 
-async function doMultipleBranches(params, numIterations) {
+async function doMultipleBranches(params, numIterations, drawContext) {
   let [initialLength, color, origin, initialAngle] = params;
   let startingPoint = origin;
   let paths = [];
@@ -159,19 +155,10 @@ async function doMultipleBranches(params, numIterations) {
     paths = [...paths, ...latestPaths];
   }
 
-  drawPaths(paths, color);
+  drawPaths(paths, color, drawContext);
 }
 
-function drawPaths(paths, color) {
-  const canvas = document.createElement('canvas');
-  canvas.width = CANVAS_WIDTH;
-  canvas.height = CANVAS_HEIGHT;
-  canvas.className = "mycelium-canvas";
-  const context = canvas.getContext("2d");
-  document.body.appendChild(canvas);
-
-  context.strokeStyle = color;
-
+function drawPaths(paths, color, drawContext) {
   const timeline = gsap.timeline();
 
   paths.forEach(path => {
@@ -181,10 +168,11 @@ function drawPaths(paths, color) {
       x: to[0],
       y: to[1],
       onUpdate: () => {
-        context.beginPath();
-        context.moveTo(from[0], from[1]);
-        context.lineTo(animPoint.x, animPoint.y);
-        context.stroke();
+        drawContext.strokeStyle = color;
+        drawContext.beginPath();
+        drawContext.moveTo(from[0], from[1]);
+        drawContext.lineTo(animPoint.x, animPoint.y);
+        drawContext.stroke();
       }
     });
   });
@@ -192,16 +180,23 @@ function drawPaths(paths, color) {
 
 async function init() {
   const ORIGIN = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2];
+
+  const drawCanvas = document.createElement('canvas');
+  drawCanvas.width = CANVAS_WIDTH;
+  drawCanvas.height = CANVAS_HEIGHT;
+  drawCanvas.className = "mycelium-canvas";
+  const drawContext = drawCanvas.getContext("2d");
+  document.body.appendChild(drawCanvas);
   
   // pit multiple branches against each other, for 3d density effect
-  await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 0], 32);
+  await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 0], 32, drawContext);
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 0], 32);
   //
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, Math.PI / 4], 2);
   //
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 3 * Math.PI / 4], 2);
   //
-  await doMultipleBranches([CANVAS_HEIGHT / 8, "brown", ORIGIN, Math.PI], 32);
+  await doMultipleBranches([CANVAS_HEIGHT / 8, "brown", ORIGIN, Math.PI], 32, drawContext);
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "brown", ORIGIN, Math.PI], 32);
   //
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 5 * Math.PI / 4], 2);
