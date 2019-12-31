@@ -1,4 +1,4 @@
-const THETA = Math.PI / 2; // looks really cool with 90 deg (pi/2)
+const THETA = Math.PI / 4; // looks really cool with 90 deg (pi/2)
 const LENGTH_SPEED_MULTIPLIER = 0.0003;
 const LENGTH_BRANCH_CUTOFF = 2;
 
