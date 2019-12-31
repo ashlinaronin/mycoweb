@@ -172,8 +172,11 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 }
 
 async function doMultipleBranches(params, numIterations) {
+  let [initialLength, color, origin, initialAngle] = params;
+  let startingPoint = origin;
   for (let i = 0; i < numIterations; i++) {
-    await doBranch(...params);
+    const newAngle = initialAngle + ((Math.PI/4) * i);
+    startingPoint = await doBranch(initialLength, color, startingPoint, newAngle);
   }
 }
 
@@ -181,17 +184,17 @@ async function init() {
   const ORIGIN = [CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2];
   
   // pit multiple branches against each other, for 3d density effect
-  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 0], 2);
-
-  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, Math.PI / 4], 2);
-
-  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 3 * Math.PI / 4], 2);
-
-  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, Math.PI], 2);
-
-  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 5 * Math.PI / 4], 2);
-
-  await doMultipleBranches([CANVAS_HEIGHT / 4, "black", ORIGIN, 7 * Math.PI / 4], 2);
+  await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 0], 32);
+  //
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, Math.PI / 4], 2);
+  //
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 3 * Math.PI / 4], 2);
+  //
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, Math.PI], 2);
+  //
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 5 * Math.PI / 4], 2);
+  //
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 7 * Math.PI / 4], 2);
 
   // todo start new branches off the end of old ones
   // await doMultipleBranches([50, "green", ORIGIN, Math.PI / 4], 3);
