@@ -65,30 +65,7 @@ async function doBranch(initialLength, color, origin, initialAngle) {
 
   currentRotation = getRotation(context);
 
-  document.body.appendChild(canvas);
-
   await branch(context, initialLength, initialAngle);
-
-  // clear out all the relative stuff so we can draw the absolute points
-  context.strokeStyle = color;
-  context.resetTransform();
-
-  const timeline = gsap.timeline();
-
-  paths.forEach(path => {
-    const [from, to, length] = path;
-    let animPoint = {x: from[0], y: from[1]};
-    timeline.to(animPoint, length * LENGTH_SPEED_MULTIPLIER, {
-      x: to[0],
-      y: to[1],
-      onUpdate: () => {
-        context.beginPath();
-        context.moveTo(from[0], from[1]);
-        context.lineTo(animPoint.x, animPoint.y);
-        context.stroke();
-      }
-    });
-  });
 
   async function branch(context, length, angle) {
     currentStartingPoint = getCurrentPoint(context);
@@ -167,17 +144,50 @@ async function doBranch(initialLength, color, origin, initialAngle) {
     currentStartingPoint = getCurrentPoint(context);
   }
 
-  // return "to" point of last path so we can chain new hyphae off of it
-  return paths[paths.length-1][1];
+  // return paths array so we can combine and draw it all in one pass
+  return paths;
 }
 
 async function doMultipleBranches(params, numIterations) {
   let [initialLength, color, origin, initialAngle] = params;
   let startingPoint = origin;
+  let paths = [];
   for (let i = 0; i < numIterations; i++) {
     const newAngle = initialAngle + ((Math.PI/4) * i);
-    startingPoint = await doBranch(initialLength, color, startingPoint, newAngle);
+    const latestPaths = await doBranch(initialLength, color, startingPoint, newAngle);
+    startingPoint = latestPaths[latestPaths.length-1][1];
+    paths = [...paths, ...latestPaths];
   }
+
+  drawPaths(paths, color);
+}
+
+function drawPaths(paths, color) {
+  const canvas = document.createElement('canvas');
+  canvas.width = CANVAS_WIDTH;
+  canvas.height = CANVAS_HEIGHT;
+  canvas.className = "mycelium-canvas";
+  const context = canvas.getContext("2d");
+  document.body.appendChild(canvas);
+
+  context.strokeStyle = color;
+
+  const timeline = gsap.timeline();
+
+  paths.forEach(path => {
+    const [from, to, length] = path;
+    let animPoint = {x: from[0], y: from[1]};
+    timeline.to(animPoint, length * LENGTH_SPEED_MULTIPLIER, {
+      x: to[0],
+      y: to[1],
+      onUpdate: () => {
+        context.beginPath();
+        context.moveTo(from[0], from[1]);
+        context.lineTo(animPoint.x, animPoint.y);
+        context.stroke();
+      }
+    });
+  });
 }
 
 async function init() {
@@ -185,12 +195,14 @@ async function init() {
   
   // pit multiple branches against each other, for 3d density effect
   await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 0], 32);
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 0], 32);
   //
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, Math.PI / 4], 2);
   //
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 3 * Math.PI / 4], 2);
   //
-  // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, Math.PI], 2);
+  await doMultipleBranches([CANVAS_HEIGHT / 8, "brown", ORIGIN, Math.PI], 32);
+  // await doMultipleBranches([CANVAS_HEIGHT / 8, "brown", ORIGIN, Math.PI], 32);
   //
   // await doMultipleBranches([CANVAS_HEIGHT / 8, "black", ORIGIN, 5 * Math.PI / 4], 2);
   //
